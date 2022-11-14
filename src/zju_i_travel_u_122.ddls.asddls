@@ -3,7 +3,7 @@
 @AbapCatalog.preserveKey: true
 @AccessControl.authorizationCheck: #NOT_REQUIRED
 @EndUserText.label: 'Basic View Travel_122'
-define view ZJU_I_TRAVEL_U_122 
+define root view ZJU_I_TRAVEL_U_122 
 as select from /dmo/travel as Travel 
   composition [0..*] of ZJU_I_BOOK_U_122 as _Booking
 
