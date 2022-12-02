@@ -1,40 +1,87 @@
-unmanaged implementation in class zbp_ju_i_travel_u_122 unique;
+implementation unmanaged;
 //strict ( 2 ); //Uncomment this line in order to enable strict mode 2. The strict mode has two variants (strict(1), strict(2)) and is prerequisite to be future proof regarding syntax and to be able to release your BO.
 
-define behavior for ZJU_I_TRAVEL_U_122 //alias <alias_name>
+define behavior for ZJU_I_TRAVEL_U_122 alias travel
+implementation in class zbp_ju_i_travel_u_122 unique
 //late numbering
 lock master
 authorization master ( instance )
 //etag master <field_name>
 {
+field ( readonly ) TravelID;
+  field ( mandatory ) AgencyID, CustomerID, BeginDate, EndDate;
   create;
   update;
   delete;
+  action set_status_booked result [1] $self;
   association _Booking { create; }
+  mapping for /dmo/travel
+  {
+    AgencyID = agency_id;
+    BeginDate = begin_date;
+    BookingFee = booking_fee;
+    CurrencyCode = currency_code;
+    CustomerID = customer_id;
+    EndDate = end_date;
+    LastChangedAt = lastchangedat;
+    Memo = description;
+    Status = status;
+    TotalPrice = total_price;
+    TravelID = travel_id;
+  }
 }
 
-define behavior for ZJU_I_BOOK_U_122 //alias <alias_name>
+define behavior for ZJU_I_BOOK_U_122 alias booking
+implementation in class zbp_ju_i_book_u_122 unique
 //late numbering
 lock dependent by _Travel
 authorization dependent by _Travel
 //etag master <field_name>
 {
-  update;
-  delete;
-  field ( readonly ) TravelID;
-  association _Travel;
-  association _BookSupplement { create; }
-}
-
-define behavior for ZJU_I_BookSupp_U_122 //alias <alias_name>
-//late numbering
-lock dependent by _Travel
-authorization dependent by _Travel
-//etag master <field_name>
-{
-  update;
-  delete;
   field ( readonly ) TravelID, BookingID;
+  field ( mandatory ) BookingDate, CustomerID, AirlineID, ConnectionID, FlightDate;
+  update;
+  delete;
+
+  association _BookSupplement { create; }
   association _Travel;
-  association _Booking;
+
+    mapping for /dmo/booking
+  {
+    AirlineID = carrier_id;
+    BookingDate = booking_date;
+    BookingID = booking_id;
+    ConnectionID = connection_id;
+    CurrencyCode = currency_code;
+    CustomerID = customer_id;
+    FlightDate = flight_date;
+    FlightPrice = flight_price;
+    TravelID = travel_id;
+  }
+
+}
+
+define behavior for ZJU_I_BookSupp_U_122 alias bookingsupplement
+implementation in class zbp_ju_i_supp_u_122 unique
+authorization dependent by _Travel
+{
+
+  field ( readonly ) TravelID, BookingID, BookingSupplementID;
+  field ( mandatory ) SupplementID, Price;
+
+
+  update;
+  delete;
+
+  association _Travel;
+
+  mapping for /dmo/book_suppl
+  {
+    BookingID           = booking_id;
+    BookingSupplementID = booking_supplement_id;
+    CurrencyCode        = currency_code;
+    Price               = price;
+    SupplementID        = supplement_id;
+    TravelID            = travel_id;
+  }
 }
